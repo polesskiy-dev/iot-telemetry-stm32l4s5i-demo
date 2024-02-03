@@ -56,3 +56,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+firmware/iot-telemetry-stm32l4s5i-demo/.cache/
