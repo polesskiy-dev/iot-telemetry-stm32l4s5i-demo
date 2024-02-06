@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -25,6 +26,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -56,6 +58,42 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+uint32_t defaultTaskBuffer[ 128 ];
+osStaticThreadDef_t defaultTaskControlBlock;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .cb_mem = &defaultTaskControlBlock,
+  .cb_size = sizeof(defaultTaskControlBlock),
+  .stack_mem = &defaultTaskBuffer[0],
+  .stack_size = sizeof(defaultTaskBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for NFCTask */
+osThreadId_t NFCTaskHandle;
+uint32_t NFCTaskBuffer[ 128 ];
+osStaticThreadDef_t NFCTaskControlBlock;
+const osThreadAttr_t NFCTask_attributes = {
+  .name = "NFCTask",
+  .cb_mem = &NFCTaskControlBlock,
+  .cb_size = sizeof(NFCTaskControlBlock),
+  .stack_mem = &NFCTaskBuffer[0],
+  .stack_size = sizeof(NFCTaskBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for DebugLEDTask */
+osThreadId_t DebugLEDTaskHandle;
+uint32_t DebugLEDTaskBuffer[ 128 ];
+osStaticThreadDef_t DebugLEDTaskControlBlock;
+const osThreadAttr_t DebugLEDTask_attributes = {
+  .name = "DebugLEDTask",
+  .cb_mem = &DebugLEDTaskControlBlock,
+  .cb_size = sizeof(DebugLEDTaskControlBlock),
+  .stack_mem = &DebugLEDTaskBuffer[0],
+  .stack_size = sizeof(DebugLEDTaskBuffer),
+  .priority = (osPriority_t) osPriorityLow,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -75,6 +113,10 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_USB_Init(void);
+void StartDefaultTask(void *argument);
+void NFCTaskHandler(void *argument);
+void debugLEDTaskHandler(void *argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -130,6 +172,47 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of NFCTask */
+  NFCTaskHandle = osThreadNew(NFCTaskHandler, NULL, &NFCTask_attributes);
+
+  /* creation of DebugLEDTask */
+  DebugLEDTaskHandle = osThreadNew(debugLEDTaskHandler, NULL, &DebugLEDTask_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -838,10 +921,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -851,6 +934,62 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_NFCTaskHandler */
+/**
+* @brief Function implementing the NFCTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_NFCTaskHandler */
+void NFCTaskHandler(void *argument)
+{
+  /* USER CODE BEGIN NFCTaskHandler */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END NFCTaskHandler */
+}
+
+/* USER CODE BEGIN Header_debugLEDTaskHandler */
+/**
+* @brief Function implementing the DebugLEDTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_debugLEDTaskHandler */
+void debugLEDTaskHandler(void *argument)
+{
+  /* USER CODE BEGIN debugLEDTaskHandler */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+    HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+    vTaskDelay(pdMS_TO_TICKS(500));
+  }
+  /* USER CODE END debugLEDTaskHandler */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
