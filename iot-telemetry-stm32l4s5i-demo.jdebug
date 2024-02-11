@@ -34,6 +34,9 @@ void OnProjectLoad (void) {
   // User settings
   //
   File.Open ("$(ProjectDir)/firmware/iot-telemetry-stm32l4s5i-demo/build/iot-telemetry-stm32l4s5i-demo.elf");
+
+  // Specify the RTOS
+  Project.SetOSPlugin("FreeRTOSPlugin_CM4");
 }
 
 /*********************************************************************
