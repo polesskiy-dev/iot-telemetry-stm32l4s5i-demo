@@ -13,7 +13,6 @@ void debugLedTask(void *argument) {
     HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 
     // Delay for a period
-//    vTaskDelay(pdMS_TO_TICKS(BLINK_PERIOD_MS));
-    vTaskDelay(BLINK_PERIOD_MS);
+    osDelay (pdMS_TO_TICKS(BLINK_PERIOD_MS));
   }
 };

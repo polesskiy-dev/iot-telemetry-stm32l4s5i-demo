@@ -21,17 +21,15 @@
 #include "cmsis_os.h"
 #include "fatfs.h"
 #include "usb_device.h"
-#include "debug_led.h"
 
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "debug_led.h"
+#include "debug_led.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -65,14 +63,9 @@ UART_HandleTypeDef huart3;
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
-uint32_t defaultTaskBuffer[ 128 ];
-osStaticThreadDef_t defaultTaskControlBlock;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .cb_mem = &defaultTaskControlBlock,
-  .cb_size = sizeof(defaultTaskControlBlock),
-  .stack_mem = &defaultTaskBuffer[0],
-  .stack_size = sizeof(defaultTaskBuffer),
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
@@ -906,7 +899,7 @@ void StartDefaultTask(void *argument)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
+  * @note   This function is called  when TIM8 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -917,7 +910,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
+  if (htim->Instance == TIM8) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
